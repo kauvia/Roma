@@ -1,6 +1,6 @@
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/cmake/")
 
-add_library(Engine Engine.cpp)
+add_library(Textures Textures.cpp)
 
 find_package(SDL2 REQUIRED)
 find_package(SDL2_image REQUIRED)
@@ -10,11 +10,4 @@ include_directories(${SDL2_INCLUDE_DIRS})
 include_directories(${SDL2_IMAGE_DIRS})
 include_directories(${SDL2TTF_DIRS})
 
-include_directories("${PROJECT_SOURCE_DIR}/Engine/Graphics")
-
-add_subdirectory(Graphics)
-
-target_link_libraries(Engine ${SDL2_LIBRARIES} ${SDL2_IMAGE_LIBRARIES} ${SDL2TTF_LIBRARY} Textures)
-
-
-
+target_link_libraries(Textures ${SDL2_LIBRARIES} ${SDL2_IMAGE_LIBRARIES} ${SDL2TTF_LIBRARY})

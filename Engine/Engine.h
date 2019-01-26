@@ -5,6 +5,8 @@
 #include <SDL2/SDL_image.h>
 #include <SDL2/SDL_ttf.h>
 
+#include "./Graphics/Textures.h"
+
 #include <iostream>
 #include <stdio.h>
 #include <string>
@@ -22,6 +24,7 @@ class Engine
     ~Engine();
 
     bool Initialize(const char *windowTitle);
+    bool loadMedia();
 
     void Update();
     void Render();
