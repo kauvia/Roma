@@ -26,12 +26,14 @@ class Engine
     void Update();
     void Render();
 
+    bool runLoop();
     void closeEngine();
 
   private:
     static SDL_Window *gWindow;
     static SDL_Renderer *gRenderer;
     static TTF_Font *gFont;
+    static SDL_Event e;
 };
 
 #endif

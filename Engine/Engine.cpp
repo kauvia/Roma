@@ -11,7 +11,8 @@ SDL_Window *Engine::gWindow = nullptr;
 SDL_Renderer *Engine::gRenderer = nullptr;
 //Global font
 TTF_Font *Engine::gFont = nullptr;
-//Rendered texture
+//Event handler
+SDL_Event Engine::e;
 
 Engine::Engine()
 {
@@ -76,6 +77,37 @@ bool Engine::Initialize(const char *windowTitle)
             }
         }
     }
+}
+
+void Update(){
+
+};
+
+void Render();
+
+bool Engine::runLoop()
+{
+    bool quit = false;
+    while (!quit)
+    {
+        while (SDL_PollEvent(&e) != 0)
+        {
+            //user quits
+            if (e.type == SDL_QUIT)
+            {
+                quit = true;
+            }
+        }
+        //clear screen
+        SDL_SetRenderDrawColor(gRenderer, 10, 50, 90, 255);
+        SDL_RenderClear(gRenderer);
+
+        //render your stuffs here
+
+        //Update the screen(s)
+        SDL_RenderPresent(gRenderer);
+    }
+    return quit;
 }
 
 void Engine::closeEngine()
