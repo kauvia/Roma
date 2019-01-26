@@ -1,0 +1,13 @@
+[
+{
+  "directory": "/home/kau/prog/cpp/Roma/build",
+  "command": "/usr/bin/c++   -I../Engine  -g   -o CMakeFiles/Roma.dir/main.cpp.o -c /home/kau/prog/cpp/Roma/main.cpp",
+  "file": "/home/kau/prog/cpp/Roma/main.cpp"
+},
+
+{
+  "directory": "/home/kau/prog/cpp/Roma/build",
+  "command": "/usr/bin/c++   -I../Engine -I/usr/include/SDL2  -g   -o Engine/CMakeFiles/Engine.dir/Engine.cpp.o -c /home/kau/prog/cpp/Roma/Engine/Engine.cpp",
+  "file": "/home/kau/prog/cpp/Roma/Engine/Engine.cpp"
+}
+]
