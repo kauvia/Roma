@@ -29,7 +29,7 @@ class LTexture
     //aplha modulation
     void setAlpha(Uint8 alpha);
     //render texture at a given point       MOSTO IMPORTANTO
-    void render(int x, int y, SDL_Rect *clip = nullptr, double angle = 0.0, SDL_Point *center = nullptr, SDL_RendererFlip flip = SDL_FLIP_NONE, SDL_Renderer *gRenderer = nullptr);
+    void render(int x, int y, SDL_Renderer *gRenderer = nullptr, SDL_Rect *clip = nullptr, double angle = 0.0, SDL_Point *center = nullptr, SDL_RendererFlip flip = SDL_FLIP_NONE);
     //getters
     int getWidth();
     int getHeight();

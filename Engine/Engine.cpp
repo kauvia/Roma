@@ -1,9 +1,9 @@
 #include "Engine.h"
 
-int Engine::SCREEN_WIDTH = 800;
-int Engine::SCREEN_HEIGHT = 600;
+int Engine::SCREEN_WIDTH = 1000;
+int Engine::SCREEN_HEIGHT = 700;
 int Engine::SCREEN_X = 100;
-int Engine::SCREEN_Y = 100;
+int Engine::SCREEN_Y = 0;
 
 //Window to render to
 SDL_Window *Engine::gWindow = nullptr;
@@ -94,7 +94,10 @@ class Entity
 
     void handleEvent(SDL_Event &e);
     void move();
-    void render();
+    void render(SDL_Renderer *gRenderer);
+
+    int getPosX();
+    int getPosY();
 
   private:
     int mPosX, mPosY;
@@ -108,6 +111,14 @@ Entity::Entity(int x, int y)
 
     mVelX = 0;
     mVelY = 0;
+}
+int Entity::getPosX()
+{
+    return mPosX;
+}
+int Entity::getPosY()
+{
+    return mPosY;
 }
 
 void Entity::handleEvent(SDL_Event &e)
@@ -136,47 +147,76 @@ void Entity::handleEvent(SDL_Event &e)
     else if (e.type == SDL_KEYUP && e.key.repeat == 0)
     {
         //Adjust the velocity
-        switch (e.key.keysym.sym)
-        {
-        case SDLK_UP:
-            mVelY += ENTITY_VEL;
-            break;
-        case SDLK_DOWN:
-            mVelY -= ENTITY_VEL;
-            break;
-        case SDLK_LEFT:
-            mVelX += ENTITY_VEL;
-            break;
-        case SDLK_RIGHT:
-            mVelX -= ENTITY_VEL;
-            break;
-        }
+        // switch (e.key.keysym.sym)
+        // {
+        // case SDLK_UP:
+        //     mVelY += ENTITY_VEL;
+        //     break;
+        // case SDLK_DOWN:
+        //     mVelY -= ENTITY_VEL;
+        //     break;
+        // case SDLK_LEFT:
+        //     mVelX += ENTITY_VEL;
+        //     break;
+        // case SDLK_RIGHT:
+        //     mVelX -= ENTITY_VEL;
+        //     break;
+        // }
     }
 }
 
 void Entity::move()
 {
     //Move the dot left or right
+    if (std::abs(mVelX) > 1)
+    {
+        if (mVelX < -1)
+        {
+            mVelX = -1;
+        }
+        else
+        {
+
+            mVelX = 1;
+        }
+    }
+    if (std::abs(mVelY) > 1)
+    {
+        if (mVelY < -1)
+        {
+            mVelY = -1;
+        }
+        else
+        {
+
+            mVelY = 1;
+        }
+    }
     mPosX += mVelX;
     //Move the dot up or down
     mPosY += mVelY;
 }
 
-void Entity::render()
+void Entity::render(SDL_Renderer *gRenderer)
 {
-    gEntityTexture.render(mPosX, mPosY);
+    gEntityTexture.render(mPosX, mPosY, gRenderer);
 };
 
 ////////////////////////////
 bool Engine::loadMedia()
 {
     bool success = true;
-    if (!gEntityTexture.loadFromFile("../planet.png", gRenderer))
+    if (!gEntityTexture.loadFromFile("../ship8.png", gRenderer))
     {
-        printf("Failed to load planet texture!\n");
+        printf("Failed to load ship8 texture!\n");
         success = false;
     }
-    printf("planet loaded\n");
+    //  gEntityTexture.setColor(100, 100, 100);
+    //  gEntityTexture.setAlpha(255);
+    //  gEntityTexture.setBlendMode(SDL_BLENDMODE_NONE);
+    printf("ship8 loaded\n");
+    std::cout << gEntityTexture.getHeight() << std::endl;
+
     return success;
 }
 
@@ -222,6 +262,8 @@ bool Engine::runLoop()
             }
 
             Engine::Update();
+            entity.handleEvent(e);
+            entity.move();
             //clear screen
             SDL_SetRenderDrawColor(gRenderer, 40, 60, 120, 255);
             SDL_RenderClear(gRenderer);
@@ -230,7 +272,8 @@ bool Engine::runLoop()
             SDL_SetRenderDrawColor(gRenderer, 0x00, 0x00, 0x00, 0xFF);
 
             SDL_RenderDrawRect(gRenderer, &wall);
-            entity.render();
+            entity.render(gRenderer);
+            //      std::cout << entity.getPosX() << std::endl;
             //         printf("rendering entity\n");
             //        std::cout << &gRenderer << std::endl;
             //Update the screen(s)
