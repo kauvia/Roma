@@ -1,5 +1,6 @@
 import Viewport from "./viewport.js";
 import Entity from "./entity.js";
+import Quadtree from "./quadtree.js";
 
 const ranN = num => Math.floor(Math.random() * num); //return random number from 0-num
 
@@ -17,11 +18,14 @@ class Engine {
 		this.mapKeys = {};
 		this.mapMouse = {};
 
-		this.user = { x: 1500, y: 1500, dispX: 300, dispY: 300 };
+		this.user = { x: 300, y: 300, dispX: 300, dispY: 300 };
 		this.mult = { x: 1, y: 1 };
 
 		this.viewport = null;
 		this.entities = new Map();
+		this.entityDeadPool = [];
+
+		this.quadtree = null;
 	}
 	initialize() {
 		let mainContainer = document.getElementById("container");
@@ -36,9 +40,20 @@ class Engine {
 		);
 
 		//init the entities
-		for (let i = 0; i < 1000; i++) {
-			let entity = new Entity(10, 10, ranN(3000), ranN(3000), `entity${i}`);
+		for (let i = 0; i < 100; i++) {
+			let entity = new Entity(10, 10, ranN(600), ranN(600), `entity${i}`);
 			this.entities.set(entity.id, entity);
+		}
+		this.quadtree = new Quadtree(
+			{ x: 0, y: 0, width: this.map.width, height: this.map.height },
+			5,
+			20
+		);
+
+		for (let entity of this.entities.values()) {
+			if (entity.isAlive) {
+				this.quadtree.insert(entity);
+			}
 		}
 	}
 
@@ -84,7 +99,7 @@ class Engine {
 				this.mapMouse.initPos.y - this.mapMouse.y / this.mult.y
 			);
 
-			console.log(x);
+			//		console.log(x);
 			this.user.x = x;
 			this.user.y = y;
 		}
@@ -110,14 +125,34 @@ class Engine {
 		this.pollEvents();
 		this.camera();
 
-		for (let entity of this.entities.values()) {
-			entity.update(this.user, this.mult);
-		}
+        this.quadtree.clear();
 
-	}
+		for (let entity of this.entities.values()) {
+			if (entity.isAlive) {
+				entity.update(this.user, this.mult);
+                this.quadtree.insert(entity);
+
+			}
+        }
+        for (let entity of this.entities.values()){
+            if (entity.isAlive){
+               let item= this.quadtree.retrieve(entity);
+               for (let i = item.length -1; i >= 0; i++ ){
+            //       console.log(item[i])
+            
+        
+        }
+                // console.log(item);
+                // console.log(this.quadtree)
+                // debugger;
+            }
+        }
+    }
+    // update tree
+
+    
 	//render all entities and refreshes
 	render(dt) {
-
 		this.ctx.fillStyle = "rgb(0, 71, 0)";
 		this.ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
 		this.ctx.beginPath();
@@ -127,9 +162,11 @@ class Engine {
 
 		for (let entity of this.entities.values()) {
 			//        console.log(entity)
-			entity.render(this.ctx);
+			if (entity.isAlive) {
+				entity.render(this.ctx);
+			}
 		}
-//		this.ctx.fillRect(this.user.dispX, this.user.dispY, 20, 20);    USER POS
+		//		this.ctx.fillRect(this.user.dispX, this.user.dispY, 20, 20);    USER POS
 		this.ctx.stroke();
 
 		this.ctx.closePath();
@@ -147,6 +184,7 @@ class Engine {
 		//		console.log(this.map);
 		//reset lasttime to now
 		lastTime = now;
+		// clear quadtree;
 	}
 }
 
