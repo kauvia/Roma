@@ -18,7 +18,7 @@ class Engine {
 		this.mapKeys = {};
 		this.mapMouse = {};
 
-		this.user = { x: 300, y: 300, dispX: 300, dispY: 300 };
+		this.user = { x: 500, y: 500, dispX: 500, dispY: 500 };
 		this.mult = { x: 1, y: 1 };
 
 		this.viewport = null;
@@ -40,8 +40,14 @@ class Engine {
 		);
 
 		//init the entities
-		for (let i = 0; i < 100; i++) {
-			let entity = new Entity(10, 10, ranN(600), ranN(600), `entity${i}`);
+		for (let i = 0; i < 800; i++) {
+			let entity = new Entity(
+				10,
+				10,
+				ranN(800) + 100,
+				ranN(800) + 100,
+				`entity${i}`
+			);
 			this.entities.set(entity.id, entity);
 		}
 		this.quadtree = new Quadtree(
@@ -125,34 +131,58 @@ class Engine {
 		this.pollEvents();
 		this.camera();
 
-        this.quadtree.clear();
+		this.quadtree.clear();
 
 		for (let entity of this.entities.values()) {
 			if (entity.isAlive) {
+				entity.isColliding = false;
+
 				entity.update(this.user, this.mult);
-                this.quadtree.insert(entity);
-
+				this.quadtree.insert(entity);
 			}
-        }
-        for (let entity of this.entities.values()){
-            if (entity.isAlive){
-               let item= this.quadtree.retrieve(entity);
-               for (let i = item.length -1; i >= 0; i++ ){
-            //       console.log(item[i])
-            
-        
-        }
-                // console.log(item);
-                // console.log(this.quadtree)
-                // debugger;
-            }
-        }
-    }
-    // update tree
+		}
+		//	let timeNow = Date.now()
 
-    
+		for (let entity of this.entities.values()) {
+			if (entity.isAlive) {
+				let entityArr = this.quadtree.retrieve(entity);
+				this.collision(entity, entityArr);
+			}
+		} //	console.log(Date.now()-timeNow)
+	}
+	// update tree
+	collision(entity, entityArr) {
+		let lens = entityArr.length;
+		if (lens > 1) {
+			for (let i = lens - 1; i >= 0; i--) {
+				let target = entityArr[i];
+				if (entity.id != target.id) {
+			//		let dis2 = Math.pow(entity.x-target.x,2)+Math.pow(entity.y-target.y,2);
+			//		let size2 = entity.width*entity.width;
+			//		console.log(dis2)
+					if (
+					//	dis2<size2
+						entity.x >= target.x &&
+						entity.x <= target.x + target.width &&
+						entity.y >= target.y &&
+						entity.y <= target.y + target.height
+					) {
+						target.isColliding = true;
+						entity.isColliding = true;
+						//do things here
+					} else {
+						//		entity.isColliding = false;
+						//		target.isColliding = false;
+					}
+				}
+			}
+		}
+	}
+
 	//render all entities and refreshes
 	render(dt) {
+		//	let timeNow = Date.now();
+
 		this.ctx.fillStyle = "rgb(0, 71, 0)";
 		this.ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
 		this.ctx.beginPath();
@@ -170,6 +200,8 @@ class Engine {
 		this.ctx.stroke();
 
 		this.ctx.closePath();
+
+		//	console.log(Date.now()-timeNow);
 	}
 
 	runLoop() {

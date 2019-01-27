@@ -21,9 +21,9 @@ class Node {
 		this.maxDepth = maxDepth;
 		this.maxChildren = maxChildren;
 
-        //test
-        this.color = ranN(255);
-        //test
+		//test
+		// this.color = ranN(255);
+		//test
 
 		this.children = [];
 		this.nodes = [];
@@ -44,7 +44,7 @@ class Node {
 				item.x >= node.bounds.x &&
 				item.x + item.width <= node.bounds.x + node.bounds.width &&
 				item.y >= node.bounds.y &&
-				item.y + item.height <= node.bounds.x + node.bounds.height
+				item.y + item.height <= node.bounds.y + node.bounds.height
 			) {
 				this.nodes[idx].insert(item);
 			} else {
@@ -79,7 +79,7 @@ class Node {
 				item.x >= node.bounds.x &&
 				item.x + item.width <= node.bounds.x + node.bounds.width &&
 				item.y >= node.bounds.y &&
-				item.y + item.height <= node.bounds.x + node.bounds.height
+				item.y + item.height <= node.bounds.y + node.bounds.height
 			) {
 				out.push.apply(out, this.nodes[idx].retrieve(item));
 			} else {
