@@ -1,49 +1,153 @@
+import Viewport from "./viewport.js";
+import Entity from "./entity.js";
+
+const ranN = num => Math.floor(Math.random() * num); //return random number from 0-num
+
 class Engine {
-    constructor(canvasHeight,canvasWidth, mapHeight,mapWidth){
-        this.mainContainer = document.getElementById('container');
-        this.canvas = document.createElement('canvas');
-        this.mainContainer.appendChild(this.canvas);
+	constructor(canvasHeight, canvasWidth, mapHeight, mapWidth) {
+		this.canvas = document.createElement("canvas");
+		this.canvas.id = "canvas";
+		this.canvas.width = canvasHeight;
+		this.canvas.height = canvasWidth;
+		this.ctx = this.canvas.getContext("2d");
 
-        this.canvas.id = "main-canvas";
+		this.map = { height: mapHeight, width: mapWidth };
 
-        this.canvas.width = canvasHeight;
-        this.canvas.height = canvasWidth;
-        this.ctx = this.canvas.getContext('2d');
+		this.runLoop = this.runLoop.bind(this);
+		this.mapKeys = {};
+		this.mapMouse = {};
 
-        this.runLoop = this.runLoop.bind(this);
+		this.user = { x: 1500, y: 1500, dispX: 300, dispY: 300 };
+		this.mult = { x: 1, y: 1 };
 
-        this.lastTime = Date.now();
-        this.now = Date.now();
-        this.dt = (this.now-this.lastTime)/1000;
-    }
+		this.viewport = null;
+		this.entities = new Map();
+	}
 	initialize() {
-        // draw canvas boundary
-        this.ctx.rect(0,0,this.canvas.width,this.canvas.height);
-        this.ctx.stroke()
-        console.log(this.rAF)
-    }
-    
-    render(dt){
+		let mainContainer = document.getElementById("container");
+		mainContainer.appendChild(this.canvas);
 
-    }
+		//init the viewport
+		this.viewport = new Viewport(
+			this.canvas.height,
+			this.canvas.width,
+			this.map.height,
+			this.map.width
+		);
 
-    update(dt){
+		//init the entities
+		for (let i = 0; i < 1000; i++) {
+			let entity = new Entity(10, 10, ranN(3000), ranN(3000), `entity${i}`);
+			this.entities.set(entity.id, entity);
+		}
+	}
 
-    }
+	pollEvents() {
+		onmousedown = onmouseup = onmousemove = onwheel = e => {
+			e = e;
+			// LEFT CLICK ONLY
+			if (e.type === "mouseup" && e.button === 0) {
+				this.mapMouse["pressed"] = false;
+			} else if (e.type === "mousedown" && e.button === 0) {
+				this.mapMouse["pressed"] = true;
+				this.mapMouse["initPos"] = {
+					x: e.clientX / this.mult.x + this.user.x,
+					y: e.clientY / this.mult.y + this.user.y
+				};
+			}
+			if (e.type === "wheel") {
+				if (e.deltaY < 0) {
+					let zoom = "in";
+					this.camera(zoom);
+					// viewport zoomin
+				} else if (e.deltaY > 0) {
+					let zoom = "out";
+					this.camera(zoom);
+					//viewport zoomout
+				}
+			}
+			this.mapMouse["x"] = e.clientX;
+			this.mapMouse["y"] = e.clientY;
+		};
+		onkeydown = onkeyup = e => {
+			e = e;
+			this.mapKeys[e.keyCode] = e.type == "keydown";
+		};
+	}
 
+	camera(zoom) {
+		if (this.mapMouse.pressed) {
+			let x = Math.round(
+				this.mapMouse.initPos.x - this.mapMouse.x / this.mult.x
+			);
+			let y = Math.round(
+				this.mapMouse.initPos.y - this.mapMouse.y / this.mult.y
+			);
 
-    runLoop(){
-        //get time per frame
-        this.now = Date.now();
-        this.dt =  (this.now-this.lastTime)/1000;
+			console.log(x);
+			this.user.x = x;
+			this.user.y = y;
+		}
+		//	console.log(zoom);
+		switch (zoom) {
+			case "in":
+				{
+					this.mult.x *= 1.1;
+					this.mult.y *= 1.1;
+				}
+				break;
+			case "out":
+				{
+					this.mult.x *= 0.9;
+					this.mult.y *= 0.9;
+				}
+				break;
+		}
+	}
+	// update all entities and views
+	update(dt) {
+		//listen for user and camera controls
+		this.pollEvents();
+		this.camera();
 
-        this.update(this.dt);
-        this.render(this.dt);
-        window.requestAnimationFrame(this.runLoop);
+		for (let entity of this.entities.values()) {
+			entity.update(this.user, this.mult);
+		}
 
-        //reset lasttime to now
-        this.lastTime = this.now;
-    }
+	}
+	//render all entities and refreshes
+	render(dt) {
+
+		this.ctx.fillStyle = "rgb(0, 71, 0)";
+		this.ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
+		this.ctx.beginPath();
+		//render entities
+
+		this.ctx.fillStyle = "rgb(210, 111, 20)";
+
+		for (let entity of this.entities.values()) {
+			//        console.log(entity)
+			entity.render(this.ctx);
+		}
+//		this.ctx.fillRect(this.user.dispX, this.user.dispY, 20, 20);    USER POS
+		this.ctx.stroke();
+
+		this.ctx.closePath();
+	}
+
+	runLoop() {
+		//get time per frame
+		let lastTime = Date.now();
+		let now = Date.now();
+		let dt = (now - lastTime) / 1000;
+
+		this.update(dt);
+		this.render(dt);
+		window.requestAnimationFrame(this.runLoop);
+		//		console.log(this.map);
+		//reset lasttime to now
+		lastTime = now;
+	}
 }
 
 export default Engine;
