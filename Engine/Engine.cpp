@@ -78,145 +78,10 @@ bool Engine::Initialize(const char *windowTitle)
         }
     }
 }
-//////////////////////////////////////
 
-// TESTINGS
-LTexture gEntityTexture;
-class Entity
-{
-  public:
-    static const int ENTITY_WIDTH = 200;
-    static const int ENTITY_HEIGHT = 200;
-
-    static const int ENTITY_VEL = 1;
-
-    Entity(int x, int y);
-
-    void handleEvent(SDL_Event &e);
-    void move();
-    void render(SDL_Renderer *gRenderer);
-
-    int getPosX();
-    int getPosY();
-
-  private:
-    int mPosX, mPosY;
-    int mVelX, mVelY;
-};
-
-Entity::Entity(int x, int y)
-{
-    mPosX = x;
-    mPosY = y;
-
-    mVelX = 0;
-    mVelY = 0;
-}
-int Entity::getPosX()
-{
-    return mPosX;
-}
-int Entity::getPosY()
-{
-    return mPosY;
-}
-
-void Entity::handleEvent(SDL_Event &e)
-{
-    //If a key was pressed
-    if (e.type == SDL_KEYDOWN && e.key.repeat == 0)
-    {
-        //Adjust the velocity
-        switch (e.key.keysym.sym)
-        {
-        case SDLK_UP:
-            mVelY -= ENTITY_VEL;
-            break;
-        case SDLK_DOWN:
-            mVelY += ENTITY_VEL;
-            break;
-        case SDLK_LEFT:
-            mVelX -= ENTITY_VEL;
-            break;
-        case SDLK_RIGHT:
-            mVelX += ENTITY_VEL;
-            break;
-        }
-    }
-    //If a key was released
-    else if (e.type == SDL_KEYUP && e.key.repeat == 0)
-    {
-        //Adjust the velocity
-        // switch (e.key.keysym.sym)
-        // {
-        // case SDLK_UP:
-        //     mVelY += ENTITY_VEL;
-        //     break;
-        // case SDLK_DOWN:
-        //     mVelY -= ENTITY_VEL;
-        //     break;
-        // case SDLK_LEFT:
-        //     mVelX += ENTITY_VEL;
-        //     break;
-        // case SDLK_RIGHT:
-        //     mVelX -= ENTITY_VEL;
-        //     break;
-        // }
-    }
-}
-
-void Entity::move()
-{
-    //Move the dot left or right
-    if (std::abs(mVelX) > 1)
-    {
-        if (mVelX < -1)
-        {
-            mVelX = -1;
-        }
-        else
-        {
-
-            mVelX = 1;
-        }
-    }
-    if (std::abs(mVelY) > 1)
-    {
-        if (mVelY < -1)
-        {
-            mVelY = -1;
-        }
-        else
-        {
-
-            mVelY = 1;
-        }
-    }
-    mPosX += mVelX;
-    //Move the dot up or down
-    mPosY += mVelY;
-}
-
-void Entity::render(SDL_Renderer *gRenderer)
-{
-    gEntityTexture.render(mPosX, mPosY, gRenderer);
-};
-
-////////////////////////////
 bool Engine::loadMedia()
 {
     bool success = true;
-    if (!gEntityTexture.loadFromFile("../ship8.png", gRenderer))
-    {
-        printf("Failed to load ship8 texture!\n");
-        success = false;
-    }
-    //  gEntityTexture.setColor(100, 100, 100);
-    //  gEntityTexture.setAlpha(255);
-    //  gEntityTexture.setBlendMode(SDL_BLENDMODE_NONE);
-    printf("ship8 loaded\n");
-    std::cout << gEntityTexture.getHeight() << std::endl;
-
     return success;
 }
 
@@ -226,6 +91,18 @@ void Engine::Update(){
 
 void Engine::Render()
 {
+    //clear screen
+    SDL_SetRenderDrawColor(gRenderer, 40, 60, 120, 255);
+    SDL_RenderClear(gRenderer);
+
+    //render your stuffs here
+
+
+
+
+
+    // this renders all
+    SDL_RenderPresent(gRenderer);
 }
 
 bool Engine::runLoop()
@@ -240,13 +117,6 @@ bool Engine::runLoop()
         bool quit = false;
 
         // the entities get loaded here?!
-        Entity entity(200, 200);
-
-        SDL_Rect wall;
-        wall.x = 100;
-        wall.y = 40;
-        wall.w = 50;
-        wall.h = 200;
 
         // end entities
 
@@ -262,22 +132,7 @@ bool Engine::runLoop()
             }
 
             Engine::Update();
-            entity.handleEvent(e);
-            entity.move();
-            //clear screen
-            SDL_SetRenderDrawColor(gRenderer, 40, 60, 120, 255);
-            SDL_RenderClear(gRenderer);
-
-            //render your stuffs here
-            SDL_SetRenderDrawColor(gRenderer, 0x00, 0x00, 0x00, 0xFF);
-
-            SDL_RenderDrawRect(gRenderer, &wall);
-            entity.render(gRenderer);
-            //      std::cout << entity.getPosX() << std::endl;
-            //         printf("rendering entity\n");
-            //        std::cout << &gRenderer << std::endl;
-            //Update the screen(s)
-            SDL_RenderPresent(gRenderer);
+            Engine::Render();
         }
         return quit;
     }
@@ -286,7 +141,7 @@ bool Engine::runLoop()
 void Engine::closeEngine()
 {
     //Free loaded images
-    gEntityTexture.free();
+
     //Destroy window
     SDL_DestroyRenderer(gRenderer);
     SDL_DestroyWindow(gWindow);
