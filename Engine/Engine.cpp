@@ -13,6 +13,10 @@ SDL_Renderer *Engine::gRenderer = nullptr;
 TTF_Font *Engine::gFont = nullptr;
 //Event handler
 SDL_Event Engine::e;
+//Rectangles
+SDL_Rect gRect;
+
+// test entities
 
 Engine::Engine()
 {
@@ -77,6 +81,9 @@ bool Engine::Initialize(const char *windowTitle)
             }
         }
     }
+    // INIT TEST FOR ENTITIES
+
+    return success;
 }
 
 bool Engine::loadMedia()
@@ -97,9 +104,10 @@ void Engine::Render()
 
     //render your stuffs here
 
-
-
-
+    gRect = {100, 100, 125, 250}; //ONLY NEED ONE SDLRECT
+    SDL_SetRenderDrawColor(gRenderer, 200, 175, 20, 255);
+    SDL_RenderFillRect(gRenderer, &gRect);
+    //
 
     // this renders all
     SDL_RenderPresent(gRenderer);
@@ -117,11 +125,19 @@ bool Engine::runLoop()
         bool quit = false;
 
         // the entities get loaded here?!
+        Entity testEnt(100, 100, 10, 10);
+        Entity testEnt2(255, 255, 10, 10);
 
+        int v;
+        int w;
+        int x;
+        int y;
         // end entities
 
         while (!quit)
         {
+            auto start = std::chrono::system_clock::now();
+
             while (SDL_PollEvent(&e) != 0)
             {
                 //user quits
@@ -132,7 +148,40 @@ bool Engine::runLoop()
             }
 
             Engine::Update();
-            Engine::Render();
+
+            v = rand() % 3 - 1;
+            w = rand() % 3 - 1;
+            x = rand() % 3 - 1;
+            y = rand() % 3 - 1;
+            testEnt.update(v, w);
+            testEnt2.update(x, y);
+
+            //AKTUALLY RENDER();
+
+            //clear screen
+            SDL_SetRenderDrawColor(gRenderer, 40, 60, 120, 255);
+            SDL_RenderClear(gRenderer);
+
+            //render your stuffs here
+
+            testEnt.render(gRenderer, gRect);
+            testEnt2.render(gRenderer, gRect);
+
+            // gRect = {100, 100, 125, 250}; //ONLY NEED ONE SDLRECT
+            // SDL_SetRenderDrawColor(gRenderer, 200, 175, 20, 255);
+            // SDL_RenderFillRect(gRenderer, &gRect);
+            //
+
+            // this renders all
+            SDL_RenderPresent(gRenderer);
+
+            auto end = std::chrono::system_clock::now();
+
+            std::chrono::duration<double> elapsed_seconds = end - start;
+            std::time_t end_time = std::chrono::system_clock::to_time_t(end);
+
+            std::cout << "elapsed time: " << elapsed_seconds.count() << "s\n";
+            std::cout << " fps: " << 1 / elapsed_seconds.count() << "fps\n";
         }
         return quit;
     }

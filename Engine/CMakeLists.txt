@@ -13,8 +13,9 @@ include_directories(${SDL2TTF_DIRS})
 include_directories("${PROJECT_SOURCE_DIR}/Engine/Graphics")
 
 add_subdirectory(Graphics)
+add_subdirectory(Data)
 
-target_link_libraries(Engine ${SDL2_LIBRARIES} ${SDL2_IMAGE_LIBRARIES} ${SDL2TTF_LIBRARY} Textures)
+target_link_libraries(Engine ${SDL2_LIBRARIES} ${SDL2_IMAGE_LIBRARIES} ${SDL2TTF_LIBRARY} Textures Entity)
 
 
 

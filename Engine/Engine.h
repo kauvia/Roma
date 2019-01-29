@@ -6,12 +6,17 @@
 #include <SDL2/SDL_ttf.h>
 
 #include "./Graphics/Textures.h"
+#include "./Data/Entity.h"
 
 #include <iostream>
 #include <stdio.h>
 #include <stdlib.h> 
 #include <string>
 #include <cmath>
+#include <cstdlib>
+
+#include <chrono>
+#include <ctime>
 
 class Engine
 {
