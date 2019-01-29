@@ -19,20 +19,22 @@ public:
   bool isAlive;
   float energy;
 
-  Entity(float x, float y, int h, int w);
+  Entity();
   ~Entity();
 
-  void move(int x,int y);
+  void initialize(float x, float y, int w, int h);
 
-  void update(int x, int y);
+  void move(float x,float y);
+
+  void update(float x, float y);
   void render(SDL_Renderer* gRenderer,SDL_Rect gRrect);
 
 private:
   float posX;
   float posY;
 
-  int height;
   int width;
+  int height;
 
   float velX;
   float velY;

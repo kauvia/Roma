@@ -1,25 +1,29 @@
 #include "Entity.h"
 
-Entity::Entity(float x, float y, int h, int w) //constructor
+Entity::Entity() //constructor
+{
+}
+
+void Entity::initialize(float x, float y, int w, int h)
 {
     // Init the position and height/width
     posX = x;
     posY = y;
-    height = h;
     width = w;
+    height = h;
 
     //Init the velocity
     velX = 0;
     velY = 0;
 }
 
-void Entity::move(int x, int y)
+void Entity::move(float x, float y)
 {
     posX += x;
     posY += y;
 }
 
-void Entity::update(int x, int y)
+void Entity::update(float x, float y)
 {
     Entity::move(x, y);
 

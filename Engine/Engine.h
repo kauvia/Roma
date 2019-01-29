@@ -12,11 +12,11 @@
 #include <stdio.h>
 #include <stdlib.h> 
 #include <string>
-#include <cmath>
 #include <cstdlib>
 
 #include <chrono>
 #include <ctime>
+#include <vector>
 
 class Engine
 {
