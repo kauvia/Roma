@@ -115,6 +115,7 @@ void Engine::Render()
 
 bool Engine::runLoop()
 {
+
     //Load Media
     if (!Engine::loadMedia())
     {
@@ -126,7 +127,8 @@ bool Engine::runLoop()
 
         std::vector<Entity> myEntities;
 
-        for (int i = 0; i < 10; i++){
+        for (int i = 0; i < 1000000; i++)
+        {
             myEntities.push_back(Entity());
         };
 
@@ -134,37 +136,37 @@ bool Engine::runLoop()
         //     std::cout << &iEntity <<std::endl;
 
         // }
-        for (auto &i: myEntities){
-            std::cout << &i << std::endl;
-            i.initialize(213,312,21,12);
+        Random<std::mt19937_64> mt64; //THIS IS FASTER THEN RAND AT OPTIMIZED BUILD
+        int rando;
+        int randa;
+        for (auto &i : myEntities)
+        {
+            i.initialize((mt64.generate_integer(0, 10000)), (mt64.generate_integer(0, 10000)), 3, 3, rand() % 256, rand() % 256, rand() % 256);
         }
 
+        // std::cout << myEntities.size() << std::endl;
+        // std::cout << &myEntities[0] << std::endl;
+        // std::cout << &myEntities[3] << std::endl;
+        // std::cout << myEntities.size() << std::endl;
+        // std::cout << myEntities.max_size() << std::endl;
 
-        std::cout << myEntities.size() << std::endl;
-        std::cout << &myEntities[0] << std::endl;
-        std::cout << &myEntities[3] << std::endl;
-        std::cout << myEntities.size() << std::endl;
-        std::cout << myEntities.max_size() << std::endl;
-
-        
-        
-        // the entities get loaded here?!
-        Entity testEnt;
-        Entity testEnt2;
-
-
-
-        testEnt.initialize(100, 100, 10, 10);
-        testEnt2.initialize(300, 300, 15, 15);
-
-        int v;
-        int w;
-        int x;
-        int y;
         // end entities
-
+        auto now = []() {
+            return std::chrono::system_clock::now().time_since_epoch().count();
+        };
         while (!quit)
         {
+
+            auto start = std::chrono::system_clock::now();
+
+            std::array<u_int64_t, 2> state1;
+            state1[0] = now();
+            state1[1] = now();
+            Xoroshiro128 xoro(state1);
+            std::vector<u_int64_t> v(20);
+
+            //     std::cout << xoro.Next() % 3 << std::endl;
+            //       std::cout << v.size() << std::endl;
 
             while (SDL_PollEvent(&e) != 0)
             {
@@ -175,50 +177,54 @@ bool Engine::runLoop()
                 }
             }
 
+            //       std::cout << (mt64.generate_integer(0,10)) << std::endl;
+
             Engine::Update();
+            for (auto &i : myEntities)
+            {
+                //               rando = xoro.Next() % 3;
+                //            randa = xoro.Next() % 3;
+                //    i.update(rando - 1, randa - 1);
 
-            v = rand() % 3 - 1;
-            w = rand() % 3 - 1;
-            x = rand() % 3 - 1;
-            y = rand() % 3 - 1;
-            testEnt.update(v, w);
-            testEnt2.update(x, y);
+                i.update((int)xoro.Next() % 5, (int)xoro.Next() % 5);
 
-        for (auto &i: myEntities){
-            std::cout << &i << std::endl;
-            i.update(rand()%3-1,rand()%3-1);
-        }
-       //     myEntities[0].update(w, v);
-                //AKTUALLY RENDER();
+        //        std::cout << (int)xoro.Next() % 10 << std::endl;
+                //      i.update((mt64.generate_integer(-5, 5)), (mt64.generate_integer(-5, 5)));
+            }
+            //     myEntities[0].update(w, v);
+            //AKTUALLY RENDER();
 
-                //clear screen
-                SDL_SetRenderDrawColor(gRenderer, 40, 60, 120, 255);
-            auto start = std::chrono::system_clock::now();
+            //clear screen
+            SDL_SetRenderDrawColor(gRenderer, 40, 60, 120, 255);
 
             SDL_RenderClear(gRenderer);
-            auto end = std::chrono::system_clock::now();
 
             //render your stuffs here
 
-            testEnt.render(gRenderer, gRect);
-            testEnt2.render(gRenderer, gRect);
-        //    myEntities[0].render(gRenderer, gRect);
-                // gRect = {100, 100, 125, 250}; //ONLY NEED ONE SDLRECT
-                // SDL_SetRenderDrawColor(gRenderer, 200, 175, 20, 255);
-                // SDL_RenderFillRect(gRenderer, &gRect);
-                //
-       for (auto &i: myEntities){
-            std::cout << &i << std::endl;
-            i.render(gRenderer,gRect);
-        }
-                // this renders all
-                SDL_RenderPresent(gRenderer);
+            //    myEntities[0].render(gRenderer, gRect);
+            // gRect = {100, 100, 125, 250}; //ONLY NEED ONE SDLRECT
+            // SDL_SetRenderDrawColor(gRenderer, 200, 175, 20, 255);
+            // SDL_RenderFillRect(gRenderer, &gRect);
+            //
+
+            for (auto &i : myEntities)
+            {
+                if (i.dispX < SCREEN_WIDTH && i.dispY < SCREEN_HEIGHT && i.dispX > 0 && i.dispY > 0)
+                {
+                    i.render(gRenderer, gRect);
+                }
+            }
+
+            // this renders all
+            SDL_RenderPresent(gRenderer);
+
+            auto end = std::chrono::system_clock::now();
 
             std::chrono::duration<double> elapsed_seconds = end - start;
             std::time_t end_time = std::chrono::system_clock::to_time_t(end);
 
-            //        std::cout << "elapsed time: " << elapsed_seconds.count() << "s\n";
-            //         std::cout << " fps: " << 1 / elapsed_seconds.count() << "fps\n";
+            std::cout << "elapsed time: " << elapsed_seconds.count() << "s\n";
+            std::cout << " fps: " << 1 / elapsed_seconds.count() << "fps\n";
         }
         return quit;
     }

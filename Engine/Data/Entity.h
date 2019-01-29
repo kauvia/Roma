@@ -22,7 +22,7 @@ public:
   Entity();
   ~Entity();
 
-  void initialize(float x, float y, int w, int h);
+  void initialize(float x, float y, int w, int h, int r, int g, int b);
 
   void move(float x,float y);
 
@@ -38,6 +38,10 @@ private:
 
   float velX;
   float velY;
+
+  int colR;
+  int colG;
+  int colB;
 };
 
 #endif

@@ -4,7 +4,7 @@ Entity::Entity() //constructor
 {
 }
 
-void Entity::initialize(float x, float y, int w, int h)
+void Entity::initialize(float x, float y, int w, int h, int r, int g, int b)
 {
     // Init the position and height/width
     posX = x;
@@ -15,6 +15,10 @@ void Entity::initialize(float x, float y, int w, int h)
     //Init the velocity
     velX = 0;
     velY = 0;
+
+    colR = r;
+    colG = g;
+    colB = b;
 }
 
 void Entity::move(float x, float y)
@@ -40,7 +44,8 @@ void Entity::render(SDL_Renderer *gRenderer, SDL_Rect gRect)
              width,
              height};
     //Apply color
-    SDL_SetRenderDrawColor(gRenderer, 200, 175, 35, 255);
+    SDL_SetRenderDrawColor(gRenderer, colR, colG, colB, 255);
+
     //Draw em
     SDL_RenderFillRect(gRenderer, &gRect);
 }
