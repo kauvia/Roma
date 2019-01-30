@@ -136,12 +136,23 @@ bool Engine::runLoop()
         //     std::cout << &iEntity <<std::endl;
 
         // }
+
+        //// FASTEST!!!!
+        auto now = []() {
+            return std::chrono::system_clock::now().time_since_epoch().count();
+        };
+        std::array<u_int64_t, 2> state1;
+        state1[0] = now();
+        state1[1] = now();
+        Xoroshiro128 xoro(state1);
+        std::vector<u_int64_t> v(20);
+
         Random<std::mt19937_64> mt64; //THIS IS FASTER THEN RAND AT OPTIMIZED BUILD
         int rando;
         int randa;
         for (auto &i : myEntities)
         {
-            i.initialize((mt64.generate_integer(0, 10000)), (mt64.generate_integer(0, 10000)), 3, 3, rand() % 256, rand() % 256, rand() % 256);
+            i.initialize((int)xoro.Next() % 5000, (int)xoro.Next() % 5000, 3, 3, rand() % 256, rand() % 256, rand() % 256);
         }
 
         // std::cout << myEntities.size() << std::endl;
@@ -151,19 +162,11 @@ bool Engine::runLoop()
         // std::cout << myEntities.max_size() << std::endl;
 
         // end entities
-        auto now = []() {
-            return std::chrono::system_clock::now().time_since_epoch().count();
-        };
+
         while (!quit)
         {
 
             auto start = std::chrono::system_clock::now();
-
-            std::array<u_int64_t, 2> state1;
-            state1[0] = now();
-            state1[1] = now();
-            Xoroshiro128 xoro(state1);
-            std::vector<u_int64_t> v(20);
 
             //     std::cout << xoro.Next() % 3 << std::endl;
             //       std::cout << v.size() << std::endl;
@@ -178,6 +181,7 @@ bool Engine::runLoop()
             }
 
             //       std::cout << (mt64.generate_integer(0,10)) << std::endl;
+       //     std::cout << (unsigned int)xoro.Next() % 5 << std::endl;
 
             Engine::Update();
             for (auto &i : myEntities)
@@ -188,7 +192,7 @@ bool Engine::runLoop()
 
                 i.update((int)xoro.Next() % 5, (int)xoro.Next() % 5);
 
-        //        std::cout << (int)xoro.Next() % 10 << std::endl;
+                //        std::cout << (int)xoro.Next() % 10 << std::endl;
                 //      i.update((mt64.generate_integer(-5, 5)), (mt64.generate_integer(-5, 5)));
             }
             //     myEntities[0].update(w, v);
